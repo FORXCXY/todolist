@@ -5,6 +5,8 @@ const App = () => {
     const [todos, setTodos] = useState([]);
     const [newTodo, setNewTodo] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [editingTodoId, setEditingTodoId] = useState(null);
+    const [editingTodoText, setEditingTodoText] = useState('');
 
     useEffect(() => {
         // 模拟登录状态检查
@@ -75,10 +77,40 @@ const App = () => {
         setTodos(todos.map((todo) => ({ ...todo, completed: !allCompleted })));
     };
 
+    const handleEditClick = (id, text) => {
+        setEditingTodoId(id);
+        setEditingTodoText(text);
+    };
+
+    const handleEditChange = (event) => {
+        setEditingTodoText(event.target.value);
+    };
+
+    const handleEditSubmit = () => {
+        if (editingTodoText.trim() !== '') {
+            setTodos(
+                todos.map((todo) =>
+                    todo.id === editingTodoId ? { ...todo, text: editingTodoText } : todo
+                )
+            );
+            setEditingTodoId(null);
+            setEditingTodoText('');
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingTodoId(null);
+        setEditingTodoText('');
+    };
+
     if (!isLoggedIn) {
         return (
-            <div>
+            <div style={{textAlign: 'center', marginTop: '50px'}}>
                 <h2>Please log in</h2>
+                <input type="text" placeholder="Username"/>
+                <br/>
+                <input type="password" placeholder="Password"/>
+                <br/>
                 <button onClick={handleLogin}>Login</button>
             </div>
         );
@@ -106,11 +138,24 @@ const App = () => {
                             checked={todo.completed}
                             onChange={() => handleToggleTodo(todo.id)}
                         />
-                        <input
-                            type="text"
-                            value={todo.text}
-                            onChange={(e) => handleEditTodo(todo.id, e.target.value)}
-                        />
+                        {editingTodoId === todo.id ? (
+                            <>
+                                <input
+                                    type="text"
+                                    value={editingTodoText}
+                                    onChange={handleEditChange}
+                                />
+                                <button onClick={handleEditSubmit}>Save</button>
+                                <button onClick={handleCancelEdit}>Cancel</button>
+                            </>
+                        ) : (
+                            <>
+                                <span>{todo.text}</span>
+                                <button onClick={() => handleEditClick(todo.id, todo.text)}>
+                                    Edit
+                                </button>
+                            </>
+                        )}
                         <button onClick={() => handleDeleteTodo(todo.id)}>Delete</button>
                     </li>
                 ))}
