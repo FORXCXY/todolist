@@ -9,7 +9,6 @@ app.use(cors());
 // 模拟用户数据
 const users = [
   { id: 1, username: 'user1', password: 'password1' },
-  { id: 2, username: 'user2', password: 'password2' },
 ];
 
 // 模拟登录状态
@@ -19,7 +18,7 @@ let isLoggedIn = false;
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   const user = users.find((user) => user.username === username && user.password === password);
-  
+  console.log(`User found: ${user}`);
   if (user) {
     isLoggedIn = true;
     res.json({ isLoggedIn: true });
